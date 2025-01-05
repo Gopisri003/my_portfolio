@@ -62,5 +62,10 @@ def contact():
         return "Something went wrong. Try again!"
 
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
+
 if __name__ == "__main__":
     app.run(debug=False, port=5001)
