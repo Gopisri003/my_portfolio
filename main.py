@@ -2,6 +2,9 @@ import csv
 import smtplib
 from flask import Flask, render_template, url_for, request, redirect
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 FROM_EMAIL = os.environ.get("FROM_EMAIL")
 TO_EMAIL = os.environ.get("TO_EMAIL")
@@ -29,6 +32,14 @@ def write_to_file(data):
         file = database.write(f"\n {name}, {email}, {subject}, {message}")
 
 
+def send_message(name, email, subject, message):
+    email_message = f"Subject:New message\n\nName: {name}\n Email: {email}\n Subject: {subject}\n Message: {message}"
+    with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
+        connection.starttls()
+        connection.login(FROM_EMAIL, MY_PASS)
+        connection.sendmail(from_addr=FROM_EMAIL, to_addrs=TO_EMAIL, msg=email_message)
+
+
 def write_to_csv(data):
     with open('database.csv', mode='a', newline='') as database2:
         name = data['name']
@@ -38,14 +49,6 @@ def write_to_csv(data):
         csv_writer = csv.writer(database2, delimiter=',')
         csv_writer.writerow([name, email, subject, message])
         send_message(name, email, subject, message)
-
-
-def send_message(name, email, subject, message):
-    email_message = f"Subject:New message\n\nName: {name}\n Email: {email}\n Subject: {subject}\n Message: {message}"
-    with smtplib.SMTP("smtp.gmail.com") as connection:
-        connection.starttls()
-        connection.login(FROM_EMAIL, MY_PASS)
-        connection.sendmail(from_addr=FROM_EMAIL, to_addrs=TO_EMAIL, msg=email_message)
 
 
 @app.route('/contact', methods=['POST', 'GET'])
@@ -60,4 +63,4 @@ def contact():
 
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=False, port=5001)
