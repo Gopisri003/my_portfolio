@@ -32,6 +32,14 @@ def write_to_file(data):
         file = database.write(f"\n {name}, {email}, {subject}, {message}")
 
 
+def send_message(name, email, subject, message):
+    email_message = f"Subject:New message\n\nName: {name}\n Email: {email}\n Subject: {subject}\n Message: {message}"
+    with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
+        connection.starttls()
+        connection.login(FROM_EMAIL, MY_PASS)
+        connection.sendmail(from_addr=FROM_EMAIL, to_addrs=TO_EMAIL, msg=email_message)
+
+
 def write_to_csv(data):
     with open('database.csv', mode='a', newline='') as database2:
         name = data['name']
@@ -52,19 +60,6 @@ def contact():
         return render_template('thankyou.html', name=user_name)
     else:
         return "Something went wrong. Try again!"
-
-
-@app.route('/favicon.ico')
-def favicon():
-    return '', 204
-
-
-def send_message(name, email, subject, message):
-    email_message = f"Subject:New message\n\nName: {name}\n Email: {email}\n Subject: {subject}\n Message: {message}"
-    with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
-        connection.starttls()
-        connection.login(FROM_EMAIL, MY_PASS)
-        connection.sendmail(from_addr=FROM_EMAIL, to_addrs=TO_EMAIL, msg=email_message)
 
 
 if __name__ == "__main__":
